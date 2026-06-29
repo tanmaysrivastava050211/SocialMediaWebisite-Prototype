@@ -1,0 +1,34 @@
+{% extends 'core/base.html' %}
+{% block title %}{% if is_explore %}Explore{% else %}Home{% endif %} | SocialSphere{% endblock %}
+{% block content %}
+<div class="app-layout">
+    <aside class="sidebar left-sidebar">
+        <section class="side-card profile-mini">
+            <img class="avatar big" src="{{ user.profile.avatar }}" alt="{{ user.username }}">
+            <h3>{{ user.username }}</h3><p>{{ user.profile.bio|default:'Building a brighter feed.' }}</p>
+            <div class="stats"><span>{{ user.followers.count }} Followers</span><span>{{ user.following.count }} Following</span></div>
+        </section>
+        <section class="side-card"><h3>Suggested</h3>{% include 'core/_suggestions.html' with users=suggested_users %}</section>
+    </aside>
+    <section class="feed-column">
+        {% if post_form %}
+        <form class="create-post card" action="{% url 'create_post' %}" method="post">
+            {% csrf_token %}
+            {{ post_form.content }}
+            <div class="counter"><span data-counter>0</span>/500</div>
+            {{ post_form.image_url }}
+            <img class="image-preview" alt="Preview">
+            <button type="submit">Publish</button>
+        </form>
+        {% else %}<h1 class="page-heading">Explore</h1>{% endif %}
+        <div id="feed" data-next-page="{% if page_obj.has_next %}{{ page_obj.next_page_number }}{% endif %}" data-has-next="{{ page_obj.has_next|yesno:'true,false' }}">
+            {% for post in page_obj %}{% include 'core/_post_card.html' %}{% empty %}<div class="empty card">No posts yet. Follow people or create the first spark.</div>{% endfor %}
+        </div>
+        {% if page_obj.has_next %}<button id="load-more" class="load-more">Load More</button>{% endif %}
+    </section>
+    <aside class="sidebar right-sidebar">
+        <section class="side-card trending"><h3>Trending</h3>{% for topic in trending_topics %}<a href="#">{{ topic }}</a>{% endfor %}</section>
+        <section class="side-card"><h3>Who to follow</h3>{% include 'core/_suggestions.html' with users=right_suggestions %}</section>
+    </aside>
+</div>
+{% endblock %}

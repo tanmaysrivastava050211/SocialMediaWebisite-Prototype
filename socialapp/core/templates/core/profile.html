@@ -1,0 +1,15 @@
+{% extends 'core/base.html' %}
+{% block title %}{{ profile_user.username }} | SocialSphere{% endblock %}
+{% block content %}
+<section class="profile-hero card">
+    <img class="avatar jumbo" src="{{ profile_user.profile.avatar }}" alt="{{ profile_user.username }}">
+    <div class="profile-main"><h1>{{ profile_user.username }}</h1><p>{{ profile_user.profile.bio|default:'No bio yet.' }}</p><div class="profile-meta"><span>{{ profile_user.profile.location|default:'Somewhere online' }}</span>{% if profile_user.profile.website %}<a href="{{ profile_user.profile.website }}">Website</a>{% endif %}</div></div>
+    <div class="profile-actions">
+        <div class="profile-stats"><span><strong data-followers-count>{{ followers_count }}</strong> Followers</span><span><strong data-following-count>{{ following_count }}</strong> Following</span><span><strong>{{ post_count }}</strong> Posts</span></div>
+        {% if profile_user == user %}<button class="btn ghost" type="button">Edit Profile</button>{% else %}<button class="btn follow-btn {% if is_following %}following{% endif %}" data-url="{% url 'follow_toggle' profile_user.username %}" type="button">{% if is_following %}Unfollow{% else %}Follow{% endif %}</button>{% endif %}
+    </div>
+</section>
+<section class="profile-grid">
+    {% for post in posts %}<a class="grid-post" href="{% url 'post_detail' post.id %}"><img src="{{ post.image_url|default:'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=800&h=500&q=80' }}" alt="Post"><span>{{ post.content|truncatechars:80 }}</span></a>{% empty %}<div class="empty card">No posts yet.</div>{% endfor %}
+</section>
+{% endblock %}

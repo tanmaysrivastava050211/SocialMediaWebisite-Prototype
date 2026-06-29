@@ -1,0 +1,24 @@
+<article class="post-card fade-in" data-post-id="{{ post.id }}">
+    <header class="post-head">
+        <a href="{% url 'profile' post.author.username %}"><img class="avatar" src="{{ post.author.profile.avatar }}" alt="{{ post.author.username }}"></a>
+        <div><a class="username" href="{% url 'profile' post.author.username %}">{{ post.author.username }}</a><p>{{ post.created_at|timesince }} ago</p></div>
+    </header>
+    <a class="post-content" href="{% url 'post_detail' post.id %}">{{ post.content|linebreaksbr }}</a>
+    {% if post.image_url %}<a class="image-shell" href="{% url 'post_detail' post.id %}"><img src="{{ post.image_url }}" alt="Post image"></a>{% endif %}
+    <footer class="post-actions">
+        <button class="icon-btn like-btn {% if user in post.likes.all %}liked{% endif %}" data-url="{% url 'like_post' post.id %}" type="button"><span class="heart">♥</span> <span class="like-count">{{ post.likes.count }}</span></button>
+        <button class="icon-btn comment-toggle" type="button">Comment <span class="comment-count">{{ post.comments.count }}</span></button>
+    </footer>
+    <section class="comments-panel">
+        <div class="comments-list">
+            {% for comment in post.comments.all|slice:':3' %}
+                <div class="comment"><img src="{{ comment.author.profile.avatar }}" alt="{{ comment.author.username }}"><p><strong>{{ comment.author.username }}</strong> {{ comment.content }}</p></div>
+            {% endfor %}
+        </div>
+        <form class="comment-form" data-url="{% url 'add_comment' post.id %}">
+            {% csrf_token %}
+            <input name="content" maxlength="300" placeholder="Write a comment..." required>
+            <button type="submit">Send</button>
+        </form>
+    </section>
+</article>
